@@ -43,11 +43,18 @@ provider:
 #    - exclude-me.py
 #    - exclude-me-dir/**
 
+layers:
+  glasswall-engine-libraries:
+    path: lib
+    description: "layer for Glasswall Engine"
+
 functions:
   test-manager:
     handler: manager.main
   test-runner:
     handler: runner.main
+    layers:
+      - {Ref: glasswall-engine-libraries}
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
