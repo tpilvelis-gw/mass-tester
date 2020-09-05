@@ -1,1 +1,1 @@
-# mass-tester
+# glasswall-core-mass-tester
