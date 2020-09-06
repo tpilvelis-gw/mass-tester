@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from uuid import UUID
 
 @dataclass
 class FileProcessingRecord:
-    guid: UUID
+    timestamp: str
+    guid: str
     file_name: str
     engine_return_status: int
     

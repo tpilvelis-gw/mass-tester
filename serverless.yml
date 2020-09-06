@@ -1,67 +1,62 @@
-service: glasswall-core-mass-tester
-# app and org for use with dashboard.serverless.com
-#app: your-app-name
-#org: your-org-name
+service: glasswall-core-mass-tester-l
 
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
-# frameworkVersion: "=X.X.X"
 
 provider:
   name: aws
   runtime: python3.8
 
   stage: dev
-  region: us-east-1
+  region: eu-west-2
 
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
-# you can add packaging information here
 #package:
+#  exclude:
+#    - lib/**
 #  include:
 #    - include-me.py
 #    - include-me-dir/**
-#  exclude:
-#    - exclude-me.py
-#    - exclude-me-dir/**
 
 layers:
-  glasswall-engine-libraries:
+  lib:
     path: lib
+    name: gw-core-rebuild-eval
     description: "layer for Glasswall Engine"
 
 functions:
   test-manager:
     handler: manager.main
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action: "lambda:InvokeFunction"
+        Resource: "*"
+    events:
+      - http:
+          path: manager/run
+          method: post
   test-runner:
     handler: runner.main
     layers:
-      - {Ref: glasswall-engine-libraries}
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
+      - {Ref: LibLambdaLayer}
+
+resources: # CloudFormation template syntax from here on.
+  Resources:
+    ProcessingRecordsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ProcessingRecordsTable
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-layer-manager
+  - serverless-iam-roles-per-function
 
 custom:
   serverless-offline:

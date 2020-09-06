@@ -2,15 +2,25 @@ from src.file_processing_record import FileProcessingRecord
 import json
 import boto3
 import uuid
+import datetime
 
 RESULTS_TABLE_NAME = "MassTesterResults"
 
 
 def main(event, context):
-    body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "input": event
+    print(f"Event:\n{event}\nConext:\n{context}")
+    event_body = json.loads(event.get("body"))
+
+    file_name = event_body.get("file_name")
+
+    run_test(file_name)
+
+    response = {
+        "statusCode": 200,
+        "body": "item"
     }
+
+    return response
 
 
 def store_record(record: FileProcessingRecord):
@@ -20,25 +30,17 @@ def store_record(record: FileProcessingRecord):
         Item=record
     )
 
-def run_test():
+def run_test(file_name: str):
+    # Logic
+
+
+
+
     record = FileProcessingRecord(
-        guid=uuid.uuid4(),
-        file_name="Test",
+        timestamp=str(datetime.datetime.now()),
+        guid=str(uuid.uuid4()),
+        file_name=file_name,
         engine_return_status=0
     )
 
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(body)
-    }
-
-    return response
-
-    # Use this code if you don't use the http event with the LAMBDA-PROXY
-    # integration
-    """
-    return {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "event": event
-    }
-    """
+    store_record(record)
