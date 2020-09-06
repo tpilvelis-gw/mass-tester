@@ -8,18 +8,17 @@ provider:
   stage: dev
   region: eu-west-2
 
-#package:
-#  exclude:
-#    - lib/**
-#  include:
-#    - include-me.py
-#    - include-me-dir/**
+package:
+  include:
+    - lib/**
+  exclude:
+    - test/**
 
-layers:
-  lib:
-    path: lib
-    name: gw-core-rebuild-eval
-    description: "layer for Glasswall Engine"
+#layers:
+#  lib:
+#    path: lib
+#    name: gw-core-rebuild-eval
+#    description: "layer for Glasswall Engine"
 
 functions:
   test-manager:
@@ -34,20 +33,20 @@ functions:
           method: post
   test-runner:
     handler: runner.main
-    layers:
-      - {Ref: LibLambdaLayer}
+#    layers:
+#      - {Ref: LibLambdaLayer}
 
 resources: # CloudFormation template syntax from here on.
   Resources:
-    ProcessingRecordsTable:
+    ProcessRecordsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ProcessingRecordsTable
+        TableName: ProcessRecordsTable
         AttributeDefinitions:
-          - AttributeName: email
+          - AttributeName: timestamp
             AttributeType: S
         KeySchema:
-          - AttributeName: email
+          - AttributeName: timestamp
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

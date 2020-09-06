@@ -4,6 +4,6 @@ from dataclasses import dataclass
 class FileProcessingRecord:
     timestamp: str
     guid: str
-    file_name: str
+    file_path: str
     engine_return_status: int
     
